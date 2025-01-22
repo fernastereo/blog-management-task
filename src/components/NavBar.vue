@@ -1,5 +1,6 @@
 <script setup>
   import { ref } from 'vue'
+  import { RouterLink } from 'vue-router'
 
   const searchPrompt = ref('');
 
@@ -12,8 +13,18 @@
   <div class="flex flex-wrap items-center gap-6 px-8 py-4">
     <h1 class="font-semibold text-gray-900">Koro Blog</h1>
     <div class="flex gap-x-8 font-semibold w-auto pl-6 text-sm">
-      <a href="#" class="text-green-600">List View</a>
-      <a href="#" class="text-gray-800">Details View</a>
+      <RouterLink to="/"
+        class="text-gray-800"
+        :exact="true"
+        active-class="text-green-600">
+        List View
+      </RouterLink>
+      <RouterLink to="/details"
+        class="text-gray-800"
+        :exact="true"
+        active-class="text-green-600">
+        Details View
+      </RouterLink>
     </div>
     <div class="flex flex-1 items-center justify-center px-2 lg:ml-6 lg:justify-end">
       <div class="grid w-full max-w-lg grid-cols-1 lg:max-w-xs">
