@@ -4,7 +4,7 @@
 
 <template>
   <main>
-    <h1>Koro Task</h1>
+    <h1 class="text-3xl font-bold underline">Koro Task</h1>
   </main>
 </template>
 
