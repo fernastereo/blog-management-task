@@ -13,9 +13,11 @@ export const usePostStore = defineStore('posts', () => {
       loading.value = true
       error.value = null
 
+      const VITE_BASE_API_URL = import.meta.env.VITE_BASE_API_URL
+
       const [postsResponse, usersResponse] = await Promise.all([
-        fetch('https://jsonplaceholder.typicode.com/posts'),
-        fetch('https://jsonplaceholder.typicode.com/users'),
+        fetch(`${VITE_BASE_API_URL}posts`),
+        fetch(`${VITE_BASE_API_URL}users`),
       ])
 
       if (!postsResponse.ok || !usersResponse.ok) {
