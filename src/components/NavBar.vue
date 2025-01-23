@@ -1,8 +1,14 @@
 <script setup>
   import { ref } from 'vue'
   import { RouterLink } from 'vue-router'
+  import { usePostStore } from '../stores/postStore'
 
-  const searchPrompt = ref('');
+  const postStore = usePostStore();
+  const searchText = ref('');
+
+  const updateSearch = () => {
+    postStore.setSearchText(searchText.value);
+  }
 
   const addNewPost = () => {
     console.log('Add new post');
@@ -30,7 +36,8 @@
       <div class="grid w-full max-w-lg grid-cols-1 lg:max-w-xs">
         <input
           type="text"
-          v-model="searchPrompt"
+          v-model="searchText"
+          @input="updateSearch"
           class="w-full rounded-md py-2 pl-5 text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-green-600"
           placeholder="Search Post..." />
       </div>

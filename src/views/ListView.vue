@@ -1,51 +1,25 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue';
+  import { usePostStore } from '../stores/postStore';
+  import { storeToRefs } from 'pinia';
   import ResultsPaginator from '../components/ResultsPaginator.vue'
+  import SpinnerLoading from '../components/SpinnerLoading.vue'
 
-  const postsWithUserNames = ref([]);
-  const error = ref(null)
+  const postStore = usePostStore();
+  const { loading, error } = storeToRefs(postStore)
+
   const currentPage = ref(1)
   const postsPerPage = ref(10)
-
-  async function fetchPostsWithUserNames() {
-    try {
-      error.value = null
-
-      const [postsResponse, usersResponse] = await Promise.all([
-        fetch('https://jsonplaceholder.typicode.com/posts'),
-        fetch('https://jsonplaceholder.typicode.com/users')
-      ])
-
-      if (!postsResponse.ok || !usersResponse.ok) {
-        throw new Error('Failed to fetch data')
-      }
-
-      const posts = await postsResponse.json()
-      const users = await usersResponse.json()
-
-      postsWithUserNames.value = posts.map(post => {
-        const user = users.find(user => user.id === post.userId)
-        return {
-          ...post,
-          userName: user ? user.name : ''
-        }
-      })
-
-
-    } catch (err) {
-      error.value = err.message
-    }
-  }
 
   // pagination
   const paginatedPosts = computed(() => {
     const start = (currentPage.value - 1) * postsPerPage.value
     const end = start + postsPerPage.value
-    return postsWithUserNames.value.slice(start, end)
+    return postStore.filteredPosts.slice(start, end)
   })
 
   const totalPages = computed(() =>
-    Math.ceil(postsWithUserNames.value.length / postsPerPage.value)
+    Math.ceil(postStore.filteredPosts.length / postsPerPage.value)
   )
 
   const nextPage = () => {
@@ -60,12 +34,19 @@
     }
   }
 
-  onMounted(fetchPostsWithUserNames)
+  onMounted(() => {
+      postStore.fetchPostsWithUserNames()
+    }
+  )
 
 </script>
 
 <template>
-  <div class="px-4">
+  <div v-if="loading" >
+    <SpinnerLoading />
+  </div>
+  <div v-else-if="error">Error: {{ error }}</div>
+  <div v-else class="px-4">
     <div class="mt-8">
       <div class="-mx-8">
         <div class="py-2 px-8">
