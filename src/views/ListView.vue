@@ -1,8 +1,11 @@
 <script setup>
-  import { ref, onMounted } from 'vue';
+  import { ref, computed, onMounted } from 'vue';
+  import ResultsPaginator from '../components/ResultsPaginator.vue'
 
   const postsWithUserNames = ref([]);
   const error = ref(null)
+  const currentPage = ref(1)
+  const postsPerPage = ref(10)
 
   async function fetchPostsWithUserNames() {
     try {
@@ -28,12 +31,37 @@
         }
       })
 
+
     } catch (err) {
       error.value = err.message
     }
   }
 
+  // pagination
+  const paginatedPosts = computed(() => {
+    const start = (currentPage.value - 1) * postsPerPage.value
+    const end = start + postsPerPage.value
+    return postsWithUserNames.value.slice(start, end)
+  })
+
+  const totalPages = computed(() =>
+    Math.ceil(postsWithUserNames.value.length / postsPerPage.value)
+  )
+
+  const nextPage = () => {
+    if (currentPage.value < totalPages.value) {
+      currentPage.value++
+    }
+  }
+
+  const prevPage = () => {
+    if (currentPage.value > 1) {
+      currentPage.value--
+    }
+  }
+
   onMounted(fetchPostsWithUserNames)
+
 </script>
 
 <template>
@@ -57,7 +85,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-300">
-              <tr v-for="post in postsWithUserNames" :key="post.id">
+              <tr v-for="post in paginatedPosts" :key="post.id">
                 <td class="py-4 pl-0 pr-3 text-sm font-medium text-gray-900">{{ post.id }}</td>
                 <td class="px-3 py-4 text-sm text-gray-500">{{ `${post.title.substring(0, 40)}...` }}</td>
                 <td class="px-3 py-4 text-sm text-gray-500">{{ `${post.body.substring(0, 40)}...` }}</td>
@@ -75,6 +103,13 @@
               </tr>
             </tbody>
           </table>
+
+          <ResultsPaginator
+            :currentPage="currentPage"
+            :totalPages="totalPages"
+            @nextPage="nextPage"
+            @prevPage="prevPage"
+          />
         </div>
       </div>
     </div>
