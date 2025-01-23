@@ -1,5 +1,4 @@
 <script setup>
-  import ButtonSolid from './ButtonSolid.vue'
   import { defineProps, defineEmits } from 'vue'
 
   const { currentPage, totalPages } = defineProps(['currentPage', 'totalPages'])
@@ -22,8 +21,8 @@
       </p>
     </div>
     <div class="flex flex-1 justify-end">
-      <ButtonSolid @click="emitPrevPage" :disabled="currentPage === 1">Prev</ButtonSolid>
-      <ButtonSolid @click="emitNextPage" :disabled="currentPage === totalPages" class="ml-3">Next</ButtonSolid>
+      <button @click="emitPrevPage" :disabled="currentPage === 1" class="text-white bg-green-600 hover:bg-green-500 px-3 py-2 rounded-md text-sm font-semibold">Prev</button>
+      <button @click="emitNextPage" :disabled="currentPage === totalPages" class="text-white bg-green-600 hover:bg-green-500 px-3 py-2 rounded-md text-sm font-semibold ml-3">Next</button>
     </div>
   </nav>
 </template>
