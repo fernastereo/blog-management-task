@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 
 export const usePostStore = defineStore('posts', () => {
   const allPosts = ref([])
+  const singlePost = ref({})
   const filteredPosts = ref([])
   const loading = ref(false)
   const error = ref(null)
@@ -43,6 +44,34 @@ export const usePostStore = defineStore('posts', () => {
     }
   }
 
+  async function fetchSinglePostWithUserName(postId) {
+    try {
+      loading.value = true
+      error.value = null
+
+      const VITE_BASE_API_URL = import.meta.env.VITE_BASE_API_URL
+
+      const postResponse = await fetch(`${VITE_BASE_API_URL}posts/${postId}`)
+      const returnedPost = await postResponse.json()
+
+      const userResponse = await fetch(`${VITE_BASE_API_URL}users/${returnedPost.userId}`)
+      const returnedUser = await userResponse.json()
+
+      const commentsResponse = await fetch(`${VITE_BASE_API_URL}posts/${postId}/comments`)
+      const returnedComments = await commentsResponse.json()
+
+      singlePost.value = {
+        ...returnedPost,
+        userName: returnedUser.name,
+        comments: returnedComments,
+      }
+    } catch (err) {
+      error.value = err.message
+    } finally {
+      loading.value = false
+    }
+  }
+
   const setSearchText = (term) => {
     searchText.value = term
     filterPosts()
@@ -58,9 +87,11 @@ export const usePostStore = defineStore('posts', () => {
 
   return {
     filteredPosts,
+    singlePost,
     loading,
     error,
     setSearchText,
     fetchPostsWithUserNames,
+    fetchSinglePostWithUserName,
   }
 })

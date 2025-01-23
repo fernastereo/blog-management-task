@@ -1,25 +1,30 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue';
+  import { RouterLink } from 'vue-router';
   import { usePostStore } from '../stores/postStore';
   import { storeToRefs } from 'pinia';
+  import { useTruncate } from '../composables/useTruncate';
+  import SearchBar from '../components/SearchBar.vue'
   import ResultsPaginator from '../components/ResultsPaginator.vue'
   import SpinnerLoading from '../components/SpinnerLoading.vue'
 
-  const postStore = usePostStore();
-  const { loading, error } = storeToRefs(postStore)
+  const postStore = usePostStore()
+  const { filteredPosts, loading } = storeToRefs(postStore)
 
   const currentPage = ref(1)
   const postsPerPage = ref(10)
+
+  const { truncate } = useTruncate()
 
   // pagination
   const paginatedPosts = computed(() => {
     const start = (currentPage.value - 1) * postsPerPage.value
     const end = start + postsPerPage.value
-    return postStore.filteredPosts.slice(start, end)
+    return filteredPosts.value.slice(start, end)
   })
 
   const totalPages = computed(() =>
-    Math.ceil(postStore.filteredPosts.length / postsPerPage.value)
+    Math.ceil(filteredPosts.value.length / postsPerPage.value)
   )
 
   const nextPage = () => {
@@ -45,15 +50,18 @@
   <div v-if="loading" >
     <SpinnerLoading />
   </div>
-  <div v-else-if="error">Error: {{ error }}</div>
   <div v-else class="px-4">
-    <div class="mt-8">
+    <div class="flex flex-row justify-end">
+      <SearchBar />
+    </div>
+
+    <div class="mt-2">
       <div class="-mx-8">
         <div class="py-2 px-8">
           <table class="min-w-full divide-y divide-gray-300">
             <thead>
               <tr>
-                <th scope="col" class="py-3 text-left text-sm font-semibold text-gray-900">id</th>
+                <th scope="col" class="py-3 text-left text-sm font-semibold text-gray-900">#</th>
                 <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Title</th>
                 <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
                 <th scope="col" class="px-3 py-3 text-left text-sm font-semibold text-gray-900">Author</th>
@@ -68,8 +76,10 @@
             <tbody class="divide-y divide-gray-300">
               <tr v-for="post in paginatedPosts" :key="post.id">
                 <td class="py-4 pl-0 pr-3 text-sm font-medium text-gray-900">{{ post.id }}</td>
-                <td class="px-3 py-4 text-sm text-gray-500">{{ `${post.title.substring(0, 40)}...` }}</td>
-                <td class="px-3 py-4 text-sm text-gray-500">{{ `${post.body.substring(0, 40)}...` }}</td>
+                <td class="px-3 py-4 text-sm text-gray-500">
+                  <RouterLink class="hover:underline" :to="`/post/${post.id}`">{{ truncate(post.title) }}</RouterLink>
+                </td>
+                <td class="px-3 py-4 text-sm text-gray-500">{{ truncate(post.body, 60) }}</td>
                 <td class="px-3 py-4 text-sm text-gray-500">{{ post.userName }}</td>
                 <td class="py-4 px-3 text-right text-sm font-medium">
                   <a href="#" class="text-green-600 hover:text-green-900"
