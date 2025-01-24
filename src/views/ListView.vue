@@ -7,6 +7,8 @@
   import SearchBar from '../components/SearchBar.vue'
   import ResultsPaginator from '../components/ResultsPaginator.vue'
   import SpinnerLoading from '../components/SpinnerLoading.vue'
+  import ModalPost from '../components/ModalPost.vue'
+  import ModalDeletePost from '../components/ModalDeletePost.vue'
 
   const postStore = usePostStore()
   const { filteredPosts, loading } = storeToRefs(postStore)
@@ -82,14 +84,10 @@
                 <td class="px-3 py-4 text-sm text-gray-500">{{ truncate(post.body, 60) }}</td>
                 <td class="px-3 py-4 text-sm text-gray-500">{{ post.userName }}</td>
                 <td class="py-4 px-3 text-right text-sm font-medium">
-                  <a href="#" class="text-green-600 hover:text-green-900"
-                    >Edit<span class="sr-only">, {{ post.id }}</span></a
-                  >
+                  <ModalPost :post="post">Edit</ModalPost>
                 </td>
                 <td class="py-4 px-3 text-right text-sm font-medium">
-                  <a href="#" class="text-green-600 hover:text-green-900"
-                    >Delete<span class="sr-only">, {{ post.id }}</span></a
-                  >
+                  <ModalDeletePost :postId="post.id">Delete</ModalDeletePost>
                 </td>
               </tr>
             </tbody>

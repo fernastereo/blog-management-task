@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const usePostStore = defineStore('posts', () => {
+  const VITE_BASE_API_URL = import.meta.env.VITE_BASE_API_URL
   const allPosts = ref([])
   const singlePost = ref({})
   const filteredPosts = ref([])
@@ -9,12 +10,10 @@ export const usePostStore = defineStore('posts', () => {
   const error = ref(null)
   const searchText = ref('')
 
-  async function fetchPostsWithUserNames() {
+  const fetchPostsWithUserNames = async () => {
     try {
       loading.value = true
       error.value = null
-
-      const VITE_BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 
       const [postsResponse, usersResponse] = await Promise.all([
         fetch(`${VITE_BASE_API_URL}posts`),
@@ -39,17 +38,16 @@ export const usePostStore = defineStore('posts', () => {
       filteredPosts.value = allPosts.value
     } catch (err) {
       error.value = err.message
+      console.error('Error fetching post:', err)
     } finally {
       loading.value = false
     }
   }
 
-  async function fetchSinglePostWithUserName(postId) {
+  const fetchSinglePostWithUserName = async (postId) => {
     try {
       loading.value = true
       error.value = null
-
-      const VITE_BASE_API_URL = import.meta.env.VITE_BASE_API_URL
 
       const postResponse = await fetch(`${VITE_BASE_API_URL}posts/${postId}`)
       const returnedPost = await postResponse.json()
@@ -67,6 +65,7 @@ export const usePostStore = defineStore('posts', () => {
       }
     } catch (err) {
       error.value = err.message
+      console.error('Error fetching post:', err)
     } finally {
       loading.value = false
     }
@@ -85,6 +84,80 @@ export const usePostStore = defineStore('posts', () => {
     )
   }
 
+  const createPost = async (postData) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await fetch(`${VITE_BASE_API_URL}posts`, {
+        method: 'POST',
+        body: JSON.stringify(postData),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+
+      const newPost = await response.json()
+      newPost.userName = postData.author
+      allPosts.value.unshift(newPost)
+
+      return newPost
+    } catch (err) {
+      error.value = err.message
+      console.error('Error creating post:', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updatePost = async (postData, postId) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await fetch(`${VITE_BASE_API_URL}posts/${postId}`, {
+        method: 'PUT',
+        body: JSON.stringify(postData),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      })
+
+      const updatedPost = await response.json()
+      const index = allPosts.value.findIndex((p) => p.id === postId)
+      if (index !== -1) {
+        allPosts.value[index] = { ...updatedPost, userName: updatedPost.author }
+      }
+    } catch (error) {
+      error.value = error.message
+      console.error('Error updating post:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const deletePost = async (postId) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await fetch(`${VITE_BASE_API_URL}posts/${postId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        error.value = 'Failed to delete post'
+      }
+
+      allPosts.value = allPosts.value.filter((post) => post.id !== postId)
+      filteredPosts.value = allPosts.value
+    } catch (error) {
+      error.value = error.message
+      console.error('Error deleting post:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     filteredPosts,
     singlePost,
@@ -93,5 +166,8 @@ export const usePostStore = defineStore('posts', () => {
     setSearchText,
     fetchPostsWithUserNames,
     fetchSinglePostWithUserName,
+    createPost,
+    updatePost,
+    deletePost,
   }
 })
