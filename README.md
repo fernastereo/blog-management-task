@@ -1,5 +1,3 @@
-Collecting workspace information
-
 # Project Documentation
 
 ## Project Overview
