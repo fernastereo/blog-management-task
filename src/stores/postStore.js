@@ -123,7 +123,8 @@ export const usePostStore = defineStore('posts', () => {
         },
       })
 
-      const updatedPost = await response.json()
+      const updatedPost = await response.json
+
       const index = allPosts.value.findIndex((p) => p.id === postId)
       if (index !== -1) {
         allPosts.value[index] = { ...updatedPost, userName: updatedPost.author }
