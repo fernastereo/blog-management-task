@@ -36,6 +36,10 @@ The usePagination composable is used to handle pagination logic. It provides rea
 
 The application fetches data from the [JSON Placeholder API](https://jsonplaceholder.typicode.com/). The base URL for the API is stored in environment variables, and the `postStore` contains methods for fetching, creating, updating, and deleting posts. The fetchPostsWithUserNames and fetchSinglePostWithUserName methods are used to fetch posts and their associated user names.
 
+## Unit Tests
+
+Unit tests have been added to ensure the reliability and stability of the application. The tests cover various functionalities such as creating and deleting posts and how some components are rendered.
+
 ### Styling with Tailwind CSS
 
 Tailwind CSS is used for styling the application. It provides a utility-first approach to styling, allowing for rapid development and a consistent design. The Tailwind configuration is defined in tailwind.config.js, and the styles are imported in style.css.
@@ -69,3 +73,17 @@ To set up the project, follow these steps:
    ```sh
    npm run lint
    ```
+
+5. Running Unit Tests
+   ```sh
+   npm run test
+   ```
+
+## Future Improvements
+
+If more time were available, the following improvements would be made:
+
+- Add more unit tests to cover additional functionalities and edge cases.
+- Implement transitions for a smoother user experience.
+- Enhance the design for a more polished look.
+- Refactor the code to eliminate any duplicated logic and improve maintainability.
