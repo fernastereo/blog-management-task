@@ -15,8 +15,51 @@
     body: post?.body || ''
   })
 
+  const rules = {
+    title: [
+      value => !!value || 'Title is required',
+      value => value.length >= 5 || 'Title must be at least 5 characters'
+    ],
+    author: [
+      value => !!value || 'Author name is required',
+      value => value.length >= 5 || 'Author name must be at least 5 characters'
+    ],
+    body: [
+      value => !!value || 'Content is required',
+      value => value.length >= 20 || 'Content must be at least 20 characters'
+    ]
+  }
+
+  const errors = reactive({
+    title: [],
+    author: [],
+    body: []
+  })
+
+  const validate = () => {
+    errors.title = rules.title
+      .map(rule => rule(postData.title))
+      .filter(result => result !== true)
+
+    errors.author = rules.author
+      .map(rule => rule(postData.author))
+      .filter(result => result !== true)
+
+    errors.body = rules.body
+      .map(rule => rule(postData.body))
+      .filter(result => result !== true)
+
+    return errors.title.length === 0 &&
+          errors.author.length === 0 &&
+          errors.body.length === 0
+  }
+
   const openModal = () => {
     isOpen.value = true
+
+    errors.title = []
+    errors.author = []
+    errors.body = []
   }
 
   const closeModal = () => {
@@ -24,12 +67,18 @@
   }
 
   const submitPost = async () => {
-    if (isEditing) {
-      await postStore.updatePost(postData, post.id)
-    } else {
-      await postStore.createPost(postData)
+    if (validate()) {
+      try {
+        if (isEditing) {
+          await postStore.updatePost(postData, post.id)
+        } else {
+          await postStore.createPost(postData)
+        }
+        closeModal()
+      } catch (error) {
+        console.error('Error submitting post:', error)
+      }
     }
-    closeModal()
   }
 </script>
 
@@ -51,24 +100,36 @@
             <label class="block text-sm font-medium mb-2">Title</label>
             <input v-model="postData.title"
                   type="text"
-                  class="w-full px-3 py-2 border rounded-md focus:outline-green-600"
+                  :class="['w-full px-3 py-2 border rounded-md focus:outline-green-600',
+                      {'border-red-500': errors.title.length}]"
                   placeholder="Enter post title" />
+            <p v-if="errors.title.length" class="text-red-500 text-sm mt-1">
+              {{ errors.title[0] }}
+            </p>
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2">Author</label>
             <input v-model="postData.author"
                   type="text"
-                  class="w-full px-3 py-2 border rounded-md focus:outline-green-600"
+                  :class="['w-full px-3 py-2 border rounded-md focus:outline-green-600',
+                      {'border-red-500': errors.author.length}]"
                   placeholder="Enter author name" />
+            <p v-if="errors.author.length" class="text-red-500 text-sm mt-1">
+              {{ errors.author[0] }}
+            </p>
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2">Content</label>
             <textarea cols="30" rows="10"
                       v-model="postData.body"
-                      class="w-full px-3 py-2 border rounded-md mb-6 focus:outline-green-600">
+                      :class="['w-full px-3 py-2 border rounded-md mb-6 focus:outline-green-600',
+                        {'border-red-500': errors.body.length}]">
             </textarea>
+            <p v-if="errors.body.length" class="text-red-500 text-sm mt-1">
+              {{ errors.body[0] }}
+            </p>
           </div>
         </div>
 
