@@ -14,7 +14,7 @@
   }
 </script>
 <template>
-  <nav class="flex items-center justify-between border-t border-gray-500 py-3">
+  <nav class="flex items-center justify-between border-t border-gray-300 py-3 mt-6">
     <div class="">
       <p class="text-sm text-gray-700">
         Showing page <span class="font-medium">{{ currentPage }}</span> of <span class="font-medium">{{ totalPages }}</span>
