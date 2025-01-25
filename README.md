@@ -36,7 +36,7 @@ The usePagination composable is used to handle pagination logic. It provides rea
 
 The application fetches data from the [JSON Placeholder API](https://jsonplaceholder.typicode.com/). The base URL for the API is stored in environment variables, and the `postStore` contains methods for fetching, creating, updating, and deleting posts. The fetchPostsWithUserNames and fetchSinglePostWithUserName methods are used to fetch posts and their associated user names.
 
-## Unit Tests
+### Unit Tests
 
 Unit tests have been added to ensure the reliability and stability of the application. The tests cover various functionalities such as creating and deleting posts and how some components are rendered.
 
@@ -59,22 +59,27 @@ To set up the project, follow these steps:
    npm install
    ```
 
-2. Compile and hot-reload for development:
+2. Create a ```.env``` file and set the ```VITE_BASE_API_URL``` variable to https://jsonplaceholder.typicode.com/
+   ```sh
+   VITE_BASE_API_URL=https://jsonplaceholder.typicode.com/
+   ```
+
+3. Compile and hot-reload for development:
    ```sh
    npm run dev
    ```
 
-3. Compile and minify for production:
+4. Compile and minify for production:
    ```sh
    npm run build
    ```
 
-4. Lint the code with ESLint:
+5. Lint the code with ESLint:
    ```sh
    npm run lint
    ```
 
-5. Running Unit Tests
+6. Running Unit Tests
    ```sh
    npm run test
    ```
